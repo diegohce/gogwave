@@ -4,6 +4,8 @@ The gogwave package provides Go language bindings for the [ggwave](https://githu
 
 **Note:** At the moment, gogwave supports linux systems only.
 
+For further detail see the [GoDocs](https://pkg.go.dev/github.com/diegohce/gogwave)
+
 ## How to use
 
 This example encodes a payload (`[]byte`) into a waveform, stores the waveform as a .wav file, and decodes the waveform back into a payload.
@@ -50,16 +52,13 @@ cd gogwave
 Build (linux):
 
 ```bash
-go generate ./...
+make
 ```
 
 Install: 
 
 ```bash
-cd ggwave/build
 sudo make install
-sudo ldconfig
-cd -
 ```
 
 after building ggwave, from gogwave's root directory run:
@@ -68,6 +67,8 @@ after building ggwave, from gogwave's root directory run:
 go test .
 ```
 tests should run fine.
+
+Note that `ggwave` directory is safe to remove now.
 
 ## License
 
