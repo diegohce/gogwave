@@ -13,45 +13,124 @@ import (
 	"unsafe"
 )
 
-type ggWaveParameters struct {
-	payloadLength        int
-	sampleRateInp        float32
-	sampleRateOut        float32
-	sampleRate           float32
-	samplesPerFrame      int
-	soundMarkerThreshold float32
-	sampleFormatInp      GGWaveSampleFormatType
-	sampleFormatOut      GGWaveSampleFormatType
-	operatingMode        int
+// GGWaveParameters configuration options for ggwave and gogwave.
+type GGWaveParameters struct {
+	// PayloadLength payload length
+	PayloadLength int
+
+	// SampleRateInp capture sample rate
+	SampleRateInp float32
+
+	// SampleRateOut playback sample rate
+	SampleRateOut float32
+
+	// SampleRate the operating sample rate
+	SampleRate float32
+
+	// SamplesPerFrame number of samples per audio frame
+	SamplesPerFrame int
+
+	// SoundMarkerThreshold sound marker detection threshold
+	SoundMarkerThreshold float32
+
+	// SampleFormatInp format of the captured audio samples
+	SampleFormatInp GGWaveSampleFormatType
+
+	// SampleFormatOut format of the playback audio samples
+	SampleFormatOut GGWaveSampleFormatType
+
+	// OperatingMode operating mode
+	OperatingMode int
+
+	// DecodeBufferSize max decoding buffer size
+	DecodeBufferSize int
+}
+
+func NewGGwaveParameters() GGWaveParameters {
+	c_gg_params := C.ggwave_getDefaultParameters()
+
+	params := GGWaveParameters{
+		PayloadLength:        int(c_gg_params.payloadLength),
+		SampleRateInp:        float32(c_gg_params.sampleRateInp),
+		SampleRateOut:        float32(c_gg_params.sampleRateOut),
+		SampleRate:           float32(c_gg_params.sampleRate),
+		SamplesPerFrame:      int(c_gg_params.samplesPerFrame),
+		SoundMarkerThreshold: float32(c_gg_params.soundMarkerThreshold),
+		SampleFormatInp:      GGWaveSampleFormatType(c_gg_params.sampleFormatInp),
+		SampleFormatOut:      GGWaveSampleFormatType(c_gg_params.sampleFormatOut),
+		OperatingMode:        int(c_gg_params.operatingMode),
+		DecodeBufferSize:     4096,
+	}
+
+	return params
 }
 
 type GGWave struct {
 	i                C.ggwave_Instance
-	params           ggWaveParameters
+	Params           GGWaveParameters
 	decodeBufferSize int
 }
 
-// New Create a new GGWave instance
+// New Creates a new GGWave instance using default paramaters values.
 //
-//	Note: Make sure to deallocate the instance at the end by calling Close()
+// Calling:
+//
+//	gg := gogwave.New()
+//
+// is the same as:
+//
+//	 p := gogwave.NewGGwaveParameters()
+//	 gg := gogwave.NewWithParams(p)
+//
+//		Note: Make sure to deallocate the instance at the end by calling Close()
 func New() *GGWave {
 	c_gg_params := C.ggwave_getDefaultParameters()
 
 	inst := C.ggwave_init(c_gg_params)
 
-	params := ggWaveParameters{
-		payloadLength:        int(c_gg_params.payloadLength),
-		sampleRateInp:        float32(c_gg_params.sampleRateInp),
-		sampleRateOut:        float32(c_gg_params.sampleRateOut),
-		sampleRate:           float32(c_gg_params.sampleRate),
-		samplesPerFrame:      int(c_gg_params.samplesPerFrame),
-		soundMarkerThreshold: float32(c_gg_params.soundMarkerThreshold),
-		sampleFormatInp:      GGWaveSampleFormatType(c_gg_params.sampleFormatInp),
-		sampleFormatOut:      GGWaveSampleFormatType(c_gg_params.sampleFormatOut),
-		operatingMode:        int(c_gg_params.operatingMode),
+	params := GGWaveParameters{
+		PayloadLength:        int(c_gg_params.payloadLength),
+		SampleRateInp:        float32(c_gg_params.sampleRateInp),
+		SampleRateOut:        float32(c_gg_params.sampleRateOut),
+		SampleRate:           float32(c_gg_params.sampleRate),
+		SamplesPerFrame:      int(c_gg_params.samplesPerFrame),
+		SoundMarkerThreshold: float32(c_gg_params.soundMarkerThreshold),
+		SampleFormatInp:      GGWaveSampleFormatType(c_gg_params.sampleFormatInp),
+		SampleFormatOut:      GGWaveSampleFormatType(c_gg_params.sampleFormatOut),
+		OperatingMode:        int(c_gg_params.operatingMode),
 	}
 
-	return &GGWave{i: inst, params: params, decodeBufferSize: 4096}
+	return &GGWave{i: inst, Params: params, decodeBufferSize: 4096}
+}
+
+// NewWithParams Create a new GGWave instance with specified parameters.
+// Calling:
+//
+//	gg := gogwave.New()
+//
+// is the same as:
+//
+//	 p := gogwave.NewGGwaveParameters()
+//	 gg := gogwave.NewWithParams(p)
+//
+//		Note: Make sure to deallocate the instance at the end by calling Close()
+func NewWhithParams(params GGWaveParameters) *GGWave {
+
+	c_gg_params := C.ggwave_Parameters{
+		payloadLength:        C.int(params.PayloadLength),
+		sampleRateInp:        C.float(params.SampleRateInp),
+		sampleRateOut:        C.float(params.SampleRateOut),
+		sampleRate:           C.float(params.SampleRate),
+		samplesPerFrame:      C.int(params.SamplesPerFrame),
+		soundMarkerThreshold: C.float(params.SoundMarkerThreshold),
+		sampleFormatInp:      C.ggwave_SampleFormat(params.SampleFormatInp),
+		sampleFormatOut:      C.ggwave_SampleFormat(params.SampleFormatOut),
+		operatingMode:        C.int(params.OperatingMode),
+	}
+
+	inst := C.ggwave_init(c_gg_params)
+
+	return &GGWave{i: inst, Params: params, decodeBufferSize: params.DecodeBufferSize}
 }
 
 // Close Free GGWave resources

@@ -28,7 +28,7 @@ func DecodeFromWav(r io.ReadSeeker) ([]byte, error) {
 func (gg *GGWave) EncodeToWav(w io.WriteSeeker, waveform []byte) error {
 	var bitDepth int
 
-	switch gg.params.sampleFormatOut {
+	switch gg.Params.SampleFormatOut {
 	case GGWaveSampleFormatU8, GGWaveSampleFormatI8:
 		bitDepth = 8
 
@@ -45,7 +45,7 @@ func (gg *GGWave) EncodeToWav(w io.WriteSeeker, waveform []byte) error {
 	auBuf := audio.IntBuffer{
 		Format: &audio.Format{
 			NumChannels: 1,
-			SampleRate:  int(gg.params.sampleRateOut),
+			SampleRate:  int(gg.Params.SampleRateOut),
 		},
 		SourceBitDepth: bitDepth,
 	}
@@ -63,7 +63,7 @@ func (gg *GGWave) EncodeToWav(w io.WriteSeeker, waveform []byte) error {
 	}
 
 	enc := wav.NewEncoder(w,
-		int(gg.params.sampleRateOut), bitDepth, 1, 1)
+		int(gg.Params.SampleRateOut), bitDepth, 1, 1)
 	defer enc.Close()
 
 	err := enc.Write(&auBuf)

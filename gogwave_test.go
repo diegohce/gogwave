@@ -26,6 +26,29 @@ func TestEncodeDecode(t *testing.T) {
 	}
 }
 
+func TestNewWithParams(t *testing.T) {
+
+	p := NewGGwaveParameters()
+
+	gg := NewWhithParams(p)
+	defer gg.Close()
+
+	waveform, err := gg.Encode([]byte("hola"), ProtocolAudibleNormal, 50)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	b, err := gg.Decode(waveform)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	payload := string(b)
+	if payload != "hola" {
+		t.Fatalf("got %s want hola", payload)
+	}
+}
+
 func TestToWav(t *testing.T) {
 	gg := New()
 	defer gg.Close()
@@ -91,6 +114,10 @@ func TestRxProtocolSetStartFreq(t *testing.T) {
 	RxProtocolSetFreqStart(ProtocolAudibleNormal, 1500)
 }
 
+func TestTxProtocolSetStartFreq(t *testing.T) {
+	TxProtocolSetFreqStart(ProtocolAudibleNormal, 1500)
+}
+
 func TestSetLogFileNIL(t *testing.T) {
 	SetLogFile(nil)
 }
@@ -103,4 +130,18 @@ func TestSetLogFileToFile(t *testing.T) {
 	f, _ := os.OpenFile("/tmp/gogwave_test.log", os.O_CREATE|os.O_APPEND, 0644)
 	SetLogFile(f)
 	f.Close()
+}
+
+func TestDecodeBufferSize(t *testing.T) {
+
+	gg := New()
+	defer gg.Close()
+
+	gg.SetDecodeBufferSize(8192)
+
+	bs := gg.DecodeBufferSize()
+
+	if bs != 8192 {
+		t.Errorf("got %d want 8192", bs)
+	}
 }
