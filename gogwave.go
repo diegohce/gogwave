@@ -26,9 +26,9 @@ type ggWaveParameters struct {
 }
 
 type GGWave struct {
-	i            C.ggwave_Instance
-	params       ggWaveParameters
-	lastNSamples int
+	i                C.ggwave_Instance
+	params           ggWaveParameters
+	decodeBufferSize int
 }
 
 // New Create a new GGWave instance
@@ -51,13 +51,25 @@ func New() *GGWave {
 		operatingMode:        int(c_gg_params.operatingMode),
 	}
 
-	return &GGWave{i: inst, params: params}
+	return &GGWave{i: inst, params: params, decodeBufferSize: 4096}
 }
 
 // Close Free GGWave resources
 func (gg *GGWave) Close() error {
 	C.ggwave_free(gg.i)
 	return nil
+}
+
+// DecodeBufferSize returns the maximum decode buffer size
+func (gg *GGWave) DecodeBufferSize() int {
+	return gg.decodeBufferSize
+}
+
+// SetDecodeBufferSize sets the maximum decode buffer size.
+//
+// Default size: 4096 bytes.
+func (gg *GGWave) SetDecodeBufferSize(size int) {
+	gg.decodeBufferSize = size
 }
 
 // Encode data into audio waveform
@@ -73,9 +85,6 @@ func (gg *GGWave) Close() error {
 func (gg *GGWave) Encode(payload []byte, protocol GGWaveProtocolType, volume int) ([]byte, error) {
 
 	payloadPtr := unsafe.SliceData(payload)
-
-	n_samples := C.ggwave_encode(gg.i, unsafe.Pointer(payloadPtr), C.int(len(payload)), C.ggwave_ProtocolId(ProtocolAudibleNormal), C.int(25), nil, C.int(2))
-	gg.lastNSamples = int(n_samples)
 
 	waveSize := C.ggwave_encode(gg.i, unsafe.Pointer(payloadPtr), C.int(len(payload)), C.ggwave_ProtocolId(ProtocolAudibleNormal), C.int(25), nil, C.int(1))
 	if waveSize < C.int(0) {
@@ -105,7 +114,7 @@ func (gg *GGWave) Decode(waveform []byte) ([]byte, error) {
 
 	waveformPtr := unsafe.SliceData(waveform)
 
-	payload := make([]byte, 4096)
+	payload := make([]byte, gg.decodeBufferSize)
 	payloadPtr := unsafe.SliceData(payload)
 
 	bcount := C.ggwave_decode(gg.i, unsafe.Pointer(waveformPtr), C.int(len(waveform)), unsafe.Pointer(payloadPtr))
