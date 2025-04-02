@@ -43,7 +43,10 @@ func (gg *GGWave) EncodeToWav(w io.WriteSeeker, waveform []byte) error {
 	buf := bytes.NewBuffer(waveform)
 
 	auBuf := audio.IntBuffer{
-		Format:         audio.FormatMono48000,
+		Format: &audio.Format{
+			NumChannels: 1,
+			SampleRate:  int(gg.params.sampleRateOut),
+		},
 		SourceBitDepth: bitDepth,
 	}
 
