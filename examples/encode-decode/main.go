@@ -53,6 +53,7 @@ func main() {
 		panic(err)
 	}
 
+	// decode .wav file
 	f, err = os.Open("message.wav")
 	if err != nil {
 		panic(err)
