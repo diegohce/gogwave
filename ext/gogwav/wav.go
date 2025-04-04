@@ -1,4 +1,4 @@
-package gogwave
+package gogwav
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 
+	"github.com/diegohce/gogwave"
 	"github.com/go-audio/audio"
 	"github.com/go-audio/wav"
 )
@@ -18,21 +19,21 @@ func DecodeFromWav(r io.ReadSeeker) ([]byte, error) {
 		return nil, err
 	}
 
-	gg := New()
+	gg := gogwave.New()
 	defer gg.Close()
 
 	return gg.Decode(waveform)
 }
 
 // EncodeToWav writes [waveform] to [w] in wav format
-func (gg *GGWave) EncodeToWav(w io.WriteSeeker, waveform []byte) error {
+func EncodeToWav(w io.WriteSeeker, waveform []byte, SampleRateOut int, SampleFormatOut gogwave.GGWaveSampleFormatType) error {
 	var bitDepth int
 
-	switch gg.Params.SampleFormatOut {
-	case GGWaveSampleFormatU8, GGWaveSampleFormatI8:
+	switch SampleFormatOut {
+	case gogwave.GGWaveSampleFormatU8, gogwave.GGWaveSampleFormatI8:
 		bitDepth = 8
 
-	case GGWaveSampleFormatU16, GGWaveSampleFormatI16:
+	case gogwave.GGWaveSampleFormatU16, gogwave.GGWaveSampleFormatI16:
 		bitDepth = 16
 
 	default:
@@ -45,7 +46,7 @@ func (gg *GGWave) EncodeToWav(w io.WriteSeeker, waveform []byte) error {
 	auBuf := audio.IntBuffer{
 		Format: &audio.Format{
 			NumChannels: 1,
-			SampleRate:  int(gg.Params.SampleRateOut),
+			SampleRate:  SampleRateOut,
 		},
 		SourceBitDepth: bitDepth,
 	}
@@ -62,8 +63,7 @@ func (gg *GGWave) EncodeToWav(w io.WriteSeeker, waveform []byte) error {
 		auBuf.Data = append(auBuf.Data, int(value))
 	}
 
-	enc := wav.NewEncoder(w,
-		int(gg.Params.SampleRateOut), bitDepth, 1, 1)
+	enc := wav.NewEncoder(w, SampleRateOut, bitDepth, 1, 1)
 	defer enc.Close()
 
 	err := enc.Write(&auBuf)

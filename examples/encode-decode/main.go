@@ -1,3 +1,5 @@
+//go:build !test
+
 // What it does:
 //
 // This example encodes a string into a ggwave waveform,
@@ -16,6 +18,7 @@ import (
 	"os"
 
 	"github.com/diegohce/gogwave"
+	"github.com/diegohce/gogwave/ext/gogwav"
 )
 
 func main() {
@@ -41,7 +44,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = gg.EncodeToWav(f, waveformMessage)
+	err = gogwav.EncodeToWav(f, waveformMessage, int(gg.Params.SampleRateOut), gg.Params.SampleFormatOut)
 	if err != nil {
 		panic(err)
 	}
@@ -59,7 +62,7 @@ func main() {
 		panic(err)
 	}
 
-	messageFromWav, err := gogwave.DecodeFromWav(f)
+	messageFromWav, err := gogwav.DecodeFromWav(f)
 	if err != nil {
 		panic(err)
 	}

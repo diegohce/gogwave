@@ -1,16 +1,18 @@
-package gogwave
+package gogwave_test
 
 import (
 	"os"
 	"testing"
+
+	"github.com/diegohce/gogwave"
 )
 
 func TestEncodeDecode(t *testing.T) {
 
-	gg := New()
+	gg := gogwave.New()
 	defer gg.Close()
 
-	waveform, err := gg.Encode([]byte("hola"), ProtocolAudibleNormal, 50)
+	waveform, err := gg.Encode([]byte("hola"), gogwave.ProtocolAudibleNormal, 50)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -28,12 +30,12 @@ func TestEncodeDecode(t *testing.T) {
 
 func TestNewWithParams(t *testing.T) {
 
-	p := NewGGwaveParameters()
+	p := gogwave.NewGGwaveParameters()
 
-	gg := NewWhithParams(p)
+	gg := gogwave.NewWhithParams(p)
 	defer gg.Close()
 
-	waveform, err := gg.Encode([]byte("hola"), ProtocolAudibleNormal, 50)
+	waveform, err := gg.Encode([]byte("hola"), gogwave.ProtocolAudibleNormal, 50)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,42 +51,11 @@ func TestNewWithParams(t *testing.T) {
 	}
 }
 
-func TestToWav(t *testing.T) {
-	gg := New()
-	defer gg.Close()
-
-	waveform, err := gg.Encode([]byte("hola"), ProtocolAudibleNormal, 50)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	f, _ := os.OpenFile("out.wav", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
-
-	err = gg.EncodeToWav(f, waveform)
-	if err != nil {
-		t.Fatal(err)
-	}
-	f.Close()
-
-	f, _ = os.OpenFile("out.wav", os.O_RDONLY, 0644)
-
-	b, err := DecodeFromWav(f)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	payload := string(b)
-	if payload != "hola" {
-		t.Fatalf("got %s want hola", payload)
-	}
-
-}
-
 func TestRxDurationFrames(t *testing.T) {
-	gg := New()
+	gg := gogwave.New()
 	defer gg.Close()
 
-	wafeform, err := gg.Encode([]byte("hola"), ProtocolAudibleNormal, 50)
+	wafeform, err := gg.Encode([]byte("hola"), gogwave.ProtocolAudibleNormal, 50)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -101,40 +72,40 @@ func TestRxDurationFrames(t *testing.T) {
 }
 
 func TestTxToggleProtocol(t *testing.T) {
-	TxToggleProtocol(ProtocolUltrasoundFast, false)
-	TxToggleProtocol(ProtocolUltrasoundFast, true)
+	gogwave.TxToggleProtocol(gogwave.ProtocolUltrasoundFast, false)
+	gogwave.TxToggleProtocol(gogwave.ProtocolUltrasoundFast, true)
 }
 
 func TestRxToggleProtocol(t *testing.T) {
-	RxToggleProtocol(ProtocolUltrasoundFast, false)
-	RxToggleProtocol(ProtocolUltrasoundFast, true)
+	gogwave.RxToggleProtocol(gogwave.ProtocolUltrasoundFast, false)
+	gogwave.RxToggleProtocol(gogwave.ProtocolUltrasoundFast, true)
 }
 
 func TestRxProtocolSetStartFreq(t *testing.T) {
-	RxProtocolSetFreqStart(ProtocolAudibleNormal, 1500)
+	gogwave.RxProtocolSetFreqStart(gogwave.ProtocolAudibleNormal, 1500)
 }
 
 func TestTxProtocolSetStartFreq(t *testing.T) {
-	TxProtocolSetFreqStart(ProtocolAudibleNormal, 1500)
+	gogwave.TxProtocolSetFreqStart(gogwave.ProtocolAudibleNormal, 1500)
 }
 
 func TestSetLogFileNIL(t *testing.T) {
-	SetLogFile(nil)
+	gogwave.SetLogFile(nil)
 }
 
 func TestSetLogFileToStderr(t *testing.T) {
-	SetLogFile(os.Stderr)
+	gogwave.SetLogFile(os.Stderr)
 }
 
 func TestSetLogFileToFile(t *testing.T) {
 	f, _ := os.OpenFile("/tmp/gogwave_test.log", os.O_CREATE|os.O_APPEND, 0644)
-	SetLogFile(f)
+	gogwave.SetLogFile(f)
 	f.Close()
 }
 
 func TestDecodeBufferSize(t *testing.T) {
 
-	gg := New()
+	gg := gogwave.New()
 	defer gg.Close()
 
 	gg.SetDecodeBufferSize(8192)
