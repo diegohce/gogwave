@@ -22,17 +22,7 @@ func main() {
 		panic(err)
 	}
 
-	f, _ := os.OpenFile("out.wav", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
-
-	err = gg.EncodeToWav(f, waveform)
-	if err != nil {
-		panic(err)
-	}
-	f.Close()
-
-	f, _ = os.OpenFile("out.wav", os.O_RDONLY, 0644)
-
-	b, err := DecodeFromWav(f)
+	b, err := gg.Decode(waveform)
 	if err != nil {
 		panic(err)
 	}

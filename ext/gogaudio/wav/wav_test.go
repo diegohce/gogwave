@@ -1,16 +1,17 @@
-package gogwav_test
+package wav
 
 import (
 	"os"
 	"testing"
 
 	"github.com/diegohce/gogwave"
-	"github.com/diegohce/gogwave/ext/gogwav"
 )
 
 func TestToWav(t *testing.T) {
 	gg := gogwave.New()
 	defer gg.Close()
+
+	codec, _ := newWavCodec(nil)
 
 	waveform, err := gg.Encode([]byte("hola"), gogwave.ProtocolAudibleNormal, 50)
 	if err != nil {
@@ -19,7 +20,7 @@ func TestToWav(t *testing.T) {
 
 	f, _ := os.OpenFile("out.wav", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
 
-	err = gogwav.EncodeToWav(f, waveform, int(gg.Params.SampleRateOut), gg.Params.SampleFormatOut)
+	err = codec.Encode(f, waveform, int(gg.Params.SampleRateOut), gg.Params.SampleFormatOut)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -27,7 +28,7 @@ func TestToWav(t *testing.T) {
 
 	f, _ = os.OpenFile("out.wav", os.O_RDONLY, 0644)
 
-	b, err := gogwav.DecodeFromWav(f)
+	b, err := codec.Decode(f)
 	if err != nil {
 		t.Fatal(err)
 	}

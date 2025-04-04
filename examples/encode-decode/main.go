@@ -18,12 +18,19 @@ import (
 	"os"
 
 	"github.com/diegohce/gogwave"
-	"github.com/diegohce/gogwave/ext/gogwav"
+	"github.com/diegohce/gogwave/ext/gogaudio"
+	_ "github.com/diegohce/gogwave/ext/gogaudio/wav"
 )
 
 func main() {
 
 	message := "Hello, World!"
+
+	wavcodec, err := gogaudio.NewCodec("wav", nil)
+	if err != nil {
+		panic(err)
+	}
+	defer wavcodec.Close()
 
 	// Comment the next line for ggwave to write log output
 	gogwave.SetLogFile(nil)
@@ -44,7 +51,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = gogwav.EncodeToWav(f, waveformMessage, int(gg.Params.SampleRateOut), gg.Params.SampleFormatOut)
+	err = wavcodec.Encode(f, waveformMessage, int(gg.Params.SampleRateOut), gg.Params.SampleFormatOut)
 	if err != nil {
 		panic(err)
 	}
@@ -62,7 +69,7 @@ func main() {
 		panic(err)
 	}
 
-	messageFromWav, err := gogwav.DecodeFromWav(f)
+	messageFromWav, err := wavcodec.Decode(f)
 	if err != nil {
 		panic(err)
 	}

@@ -1,4 +1,4 @@
-package gogwav
+package wav
 
 import (
 	"bytes"
@@ -6,10 +6,30 @@ import (
 	"errors"
 	"io"
 
-	"github.com/diegohce/gogwave"
 	"github.com/go-audio/audio"
 	"github.com/go-audio/wav"
+
+	"github.com/diegohce/gogwave"
+	"github.com/diegohce/gogwave/ext/gogaudio"
 )
+
+type WavCodec struct{}
+
+func newWavCodec(_ any) (gogaudio.AudioCodec, error) {
+	return &WavCodec{}, nil
+}
+
+func (c *WavCodec) Decode(r io.ReadSeeker) ([]byte, error) {
+	return DecodeFromWav(r)
+}
+
+func (c *WavCodec) Encode(w io.WriteSeeker, waveform []byte, SampleRateOut int, SampleFormatOut gogwave.GGWaveSampleFormatType) error {
+	return EncodeToWav(w, waveform, SampleRateOut, SampleFormatOut)
+}
+
+func (c *WavCodec) Close() error {
+	return nil
+}
 
 // DecodeFromWav reads from [r] and returns a [payload]
 func DecodeFromWav(r io.ReadSeeker) ([]byte, error) {
@@ -72,4 +92,8 @@ func EncodeToWav(w io.WriteSeeker, waveform []byte, SampleRateOut int, SampleFor
 	}
 
 	return nil
+}
+
+func init() {
+	gogaudio.Register("wav", newWavCodec)
 }
