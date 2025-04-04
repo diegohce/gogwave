@@ -1,4 +1,6 @@
-# gogwave
+[![Go Reference](https://pkg.go.dev/badge/github.com/diegohce/gogwave.svg)](https://pkg.go.dev/github.com/diegohce/gogwave) [![Go Report Card](https://goreportcard.com/badge/github.com/diegohce/gogwave)](https://goreportcard.com/report/github.com/diegohce/gogwave) 
+
+# GoGWave
 
 The gogwave package provides Go language bindings for the [ggwave](https://github.com/ggerganov/ggwave) C++ library.
 
@@ -40,7 +42,11 @@ func main() {
 }
 ```
 
-## How to install
+## How to build & install ggwave
+
+To install ggwave library follow the [ggwave building/installing instructions](https://github.com/ggerganov/ggwave?tab=readme-ov-file#building)
+
+An alternative is using GoGWave's `Makefile`
 
 Clone this repo:
 
@@ -61,18 +67,18 @@ Install:
 sudo make install
 ```
 
-after building ggwave, from gogwave's root directory run:
+after building ggwave, from GoGWave's root directory run:
 
 ```bash
 go test .
 ```
 tests should run fine.
 
-Note that `ggwave` directory is safe to remove now.
+**Note:** `ggwave` directory is safe to remove after building and installing.
 
 ## License
 
-Licensed under the Apache 2.0 license. Copyright (c) 2025 Diego Cena
+GoGWave is licensed under the Apache 2.0 license. Copyright (c) 2025 Diego Cena
 
 ## ggwave License
 
