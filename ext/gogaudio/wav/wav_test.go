@@ -18,6 +18,8 @@ func TestToWav(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	defer os.Remove("out.wav")
+
 	f, _ := os.OpenFile("out.wav", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
 
 	err = codec.Encode(f, waveform, int(gg.Params.SampleRateOut), gg.Params.SampleFormatOut)
