@@ -16,7 +16,7 @@ func TestInvalidCodec(t *testing.T) {
 
 type noopCodec struct{}
 
-func (c *noopCodec) Decode(r io.ReadSeeker) ([]byte, error) {
+func (c *noopCodec) Decode(r io.Reader) ([]byte, error) {
 	return nil, nil
 }
 
@@ -31,7 +31,7 @@ func TestRegisterCodec(t *testing.T) {
 	newNoopCodec := func(_ any) (AudioCodec, error) {
 		return &noopCodec{}, nil
 	}
-	Register("noop", newNoopCodec)
+	RegisterCodec("noop", newNoopCodec)
 }
 
 func TestValidCodec(t *testing.T) {
@@ -39,7 +39,7 @@ func TestValidCodec(t *testing.T) {
 	newNoopCodec := func(_ any) (AudioCodec, error) {
 		return &noopCodec{}, nil
 	}
-	Register("noop", newNoopCodec)
+	RegisterCodec("noop", newNoopCodec)
 
 	c, err := NewCodec("noop", nil)
 	if err != nil {

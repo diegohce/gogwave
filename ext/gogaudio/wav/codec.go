@@ -19,20 +19,20 @@ func newWavCodec(_ any) (gogaudio.AudioCodec, error) {
 	return &WavCodec{}, nil
 }
 
-func (c *WavCodec) Decode(r io.ReadSeeker) ([]byte, error) {
-	return DecodeFromWav(r)
+func (c *WavCodec) Decode(r io.Reader) ([]byte, error) {
+	return decodeFromWav(r)
 }
 
 func (c *WavCodec) Encode(w io.WriteSeeker, waveform []byte, SampleRateOut int, SampleFormatOut gogwave.GGWaveSampleFormatType) error {
-	return EncodeToWav(w, waveform, SampleRateOut, SampleFormatOut)
+	return encodeToWav(w, waveform, SampleRateOut, SampleFormatOut)
 }
 
 func (c *WavCodec) Close() error {
 	return nil
 }
 
-// DecodeFromWav reads from [r] and returns a [payload]
-func DecodeFromWav(r io.ReadSeeker) ([]byte, error) {
+// decodeFromWav reads from [r] and returns a [payload]
+func decodeFromWav(r io.Reader) ([]byte, error) {
 
 	waveform, err := io.ReadAll(r)
 	if err != nil {
@@ -45,8 +45,8 @@ func DecodeFromWav(r io.ReadSeeker) ([]byte, error) {
 	return gg.Decode(waveform)
 }
 
-// EncodeToWav writes [waveform] to [w] in wav format
-func EncodeToWav(w io.WriteSeeker, waveform []byte, SampleRateOut int, SampleFormatOut gogwave.GGWaveSampleFormatType) error {
+// encodeToWav writes [waveform] to [w] in wav format
+func encodeToWav(w io.WriteSeeker, waveform []byte, SampleRateOut int, SampleFormatOut gogwave.GGWaveSampleFormatType) error {
 	var bitDepth int
 
 	switch SampleFormatOut {
@@ -95,5 +95,5 @@ func EncodeToWav(w io.WriteSeeker, waveform []byte, SampleRateOut int, SampleFor
 }
 
 func init() {
-	gogaudio.Register("wav", newWavCodec)
+	gogaudio.RegisterCodec("wav", newWavCodec)
 }
