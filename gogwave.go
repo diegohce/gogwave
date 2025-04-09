@@ -71,7 +71,7 @@ type GGWave struct {
 	decodeBufferSize int
 }
 
-// New Creates a new GGWave instance using default paramaters values.
+// New Creates a new GGWave instance using default parameters values.
 //
 // Calling:
 //
